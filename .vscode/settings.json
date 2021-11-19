@@ -1,0 +1,9 @@
+{
+  "C_Cpp.intelliSenseEngineFallback": "Disabled",
+  "files.associations": {
+    "multiboot.h": "c",
+    "memlayout.h": "c",
+    "mmu.h": "c",
+    "types.h": "c"
+  }
+}

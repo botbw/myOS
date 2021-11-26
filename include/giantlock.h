@@ -1,0 +1,2 @@
+void acquire();
+void release();

@@ -4,6 +4,9 @@
     "multiboot.h": "c",
     "memlayout.h": "c",
     "mmu.h": "c",
-    "types.h": "c"
+    "types.h": "c",
+    "kalloc.h": "c",
+    "defs.h": "c",
+    "giantlock.h": "c"
   }
 }

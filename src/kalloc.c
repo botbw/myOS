@@ -1,8 +1,9 @@
 #include "mmu.h"
 #include "memlayout.h"
 #include "types.h"
-#include "spinlock.h"
+#include "giantlock.h"
 #include "defs.h"
+#include "kalloc.h"
 
 extern char end[]; // the end of kernel memory, defined in kernel.ld: PROVIDE(end = .);
 
@@ -17,6 +18,7 @@ struct run {
 struct {
   struct run* head;
   uint pgnum;
+  int use_lock;
 } kmem;
 
 // free one page and fill it with junk, the interrupt is assumed to be turned on already;
@@ -26,12 +28,21 @@ void kfree(void *ptr) {
     panic("kfree");
 
   memset(ptr, 1, PGSIZE);
-  lock();
+  if(kmem.use_lock) acquire();
   struct run *tmp = (struct run*)ptr;
   tmp->next = kmem.head;
   kmem.head = tmp;
   kmem.pgnum++;
-  release();
+  if(kmem.use_lock) release();
+}
+
+// alloc one memory page filled with junk;
+void *kalloc() {
+  if(kmem.use_lock) acquire();
+  struct run *tmp = kmem.head;
+  kmem.head = kmem.head->next;
+  if(kmem.use_lock) release();
+  return (void*)tmp;
 }
 
 // free a range of memory using kfree(ptr);
@@ -42,16 +53,33 @@ void freerange(void* start_addr, void* end_addr) {
     kfree(p);
 }
 
-// similar to freerange(end, phystop), but with interrupt turned off
+// similar to freerange(end, 4mb), but with interrupt turned off
 // only the first 4MB because we only set up its memory mapping in entrypgdir[] defined in main.c
 void kinit() {
-  kmem.head = NULL;
+  kmem.head = 0;
   kmem.pgnum = 0;
+  kmem.use_lock = 0;
 
   char *p = end;
-  char *end_of_4MB = V2P(4*1024*1024);
+  char *end_of_4MB = P2V(4*1024*1024);
 
   for(; p + PGSIZE <= end_of_4MB; p += PGSIZE) {
+    struct run *tmp = (struct run*)p;
+    tmp->next = kmem.head;
+    kmem.head = tmp;
+    kmem.pgnum++;
+  }
+}
+
+// similar to kinit(), but map all the memory
+void kinit_all() {
+  kmem.head = 0;
+  kmem.pgnum = 0;
+
+  char *p = P2V(4*1024*1024);
+  char *end = P2V(PHYSTOP);
+
+  for(; p + PGSIZE <= end; p += PGSIZE) {
     struct run *tmp = (struct run*)p;
     tmp->next = kmem.head;
     kmem.head = tmp;

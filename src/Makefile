@@ -78,8 +78,5 @@ qemu-gdb: myOS.img .gdbinit
 	qemu-system-i386 -nographic $(QEMUOPTS) -S $(QEMUGDB)
 
 clean:
-	rm *.o *.asm *.sym gdb.txt elf.txt
-	rm -rf tmp
-	rm kernel
-	rm myOS.img
+	rm *.o *.asm *.sym gdb.txt elf.txt -rf tmp kernel myOS.img
 			

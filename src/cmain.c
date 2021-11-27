@@ -20,7 +20,7 @@
 uint mem_lower, mem_upper, phystop; // mem_lower is not used
 
 
-static char welcome_str[34] = "virtual memory boot test succeeds";
+static char welcome_str[29] = "virtual memory boot succeeds";
 
 void write_string(char* c, int len);
 int init_serial();
@@ -33,7 +33,6 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
 
   // initialize screen output
   if(init_serial() != 0) return ;
-  write_string(welcome_str, 34);
   
   // get memory infomation
   if(CHECK_FLAG(mbi->flags, 0)) {
@@ -51,6 +50,9 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   // init the remnant of kernel memory
   kinit_all();
 
+  write_string(welcome_str, 29);
+
+  while(1);
 }
 
 // The boot page table used in entry.S and entryother.S.

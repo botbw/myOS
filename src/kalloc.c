@@ -7,8 +7,6 @@
 
 extern char end[]; // the end of kernel memory, defined in kernel.ld: PROVIDE(end = .);
 
-extern uint phystop; // defined in main.c
-
 // a page/chunk of memory
 struct run {
   struct run* next;
@@ -24,7 +22,7 @@ struct {
 // free one page and fill it with junk, the interrupt is assumed to be turned on already;
 void kfree(void *ptr) {
 
-  if((uint)ptr % PGSIZE || (char*)ptr < end || V2P(ptr) >= phystop)
+  if((uint)ptr % PGSIZE || (char*)ptr < end || V2P(ptr) >= PHYSTOP)
     panic("kfree");
 
   memset(ptr, 1, PGSIZE);

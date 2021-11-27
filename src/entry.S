@@ -20,8 +20,21 @@ multiboot_header:
 # the kernel begins here. Do not return in this file!
 .global entry
 entry:
-  /* from grub multiboot */
-  movl $(V2P_WO(stack+KSTACKSIZE)), %esp
+  cli
+  # Turn on page size extension for 4Mbyte pages
+  movl    %cr4, %ecx
+  orl     $(CR4_PSE), %ecx
+  movl    %ecx, %cr4
+  # Set page directory
+  movl    $(V2P_WO(entrypgdir)), %ecx
+  movl    %ecx, %cr3
+  # Turn on paging.
+  movl    %cr0, %ecx
+  orl     $(CR0_PG|CR0_WP), %ecx
+  movl    %ecx, %cr0
+
+    /* from grub multiboot */
+  movl $(stack+KSTACKSIZE), %esp
   pushl $0
   popf 
   /* Push the pointer to the Multiboot information structure. */
@@ -30,21 +43,6 @@ entry:
   pushl   %eax
   push $2
 
-
-  # Turn on page size extension for 4Mbyte pages
-  movl    %cr4, %eax
-  orl     $(CR4_PSE), %eax
-  movl    %eax, %cr4
-  # Set page directory
-  movl    $(V2P_WO(entrypgdir)), %eax
-  movl    %eax, %cr3
-  # Turn on paging.
-  movl    %cr0, %eax
-  orl     $(CR0_PG|CR0_WP), %eax
-  movl    %eax, %cr0
-
-
-  cli
   # Jump to main(), and switch to executing at
   # high addresses. The indirect call is needed because
   # the assembler produces a PC-relative instruction

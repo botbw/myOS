@@ -52,6 +52,7 @@ kernel: $(OBJS) kernel.ld entry.o
 	$(LD) $(LDFLAGS) -T kernel.ld -o kernel $(OBJS) entry.o 
 	$(OBJDUMP) -S kernel > kernel.asm
 	$(OBJDUMP) -t kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > kernel.sym
+	readelf -a kernel > elf.txt
 myOS.img: kernel grub.cfg
 	mkdir -p tmp/boot/grub
 	cp grub.cfg tmp/boot/grub
@@ -77,7 +78,7 @@ qemu-gdb: myOS.img .gdbinit
 	qemu-system-i386 -nographic $(QEMUOPTS) -S $(QEMUGDB)
 
 clean:
-	rm *.o
+	rm *.o *.asm *.sym gdb.txt elf.txt
 	rm -rf tmp
 	rm kernel
 	rm myOS.img

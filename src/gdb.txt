@@ -1,0 +1,13 @@
+#0  mappages (pgdir=0x803fe0a0, va=0x80000000, sz=1048576, pa=0, perm=2) at vm.c:53
+$5 = 0x80000000 "S\377"
+[  10:80100415]    0x80100515 <memcmp+9>:	mov    0x8(%ebp),%ecx
+[  10:80100425]    0x80100525 <memcmp+25>:	movzbl (%ecx),%eax
+[  10:8010042c]    0x8010052c <memcmp+32>:	fdivs  0xa(%ebp)
+Breakpoint 1 at 0x801003c0: file vm.c, line 50.
+Continuing.
+[  10:801003c0]    0x801004c0 <kvmalloc+121>:	mov    -0x4(%ebp),%ebx
+
+Breakpoint 1, mappages (pgdir=0x803fe0a0, va=0x80000000, sz=1048576, pa=0, perm=2) at vm.c:50
+50	int mappages(pde_t* pgdir, void* va, uint sz, uint pa, int perm) {
+Detaching from program: , process 1
+Remote communication error.  Target disconnected.: Broken pipe.

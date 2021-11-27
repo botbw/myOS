@@ -50,10 +50,10 @@ pte_t *walkpgdir(pde_t *pgdir, const void* va, int alloc) {
 int mappages(pde_t* pgdir, void* va, uint sz, uint pa, int perm) {
   char *p = (char*)PGROUNDDOWN((uint)va);                 // mapping is by pages
   char *end = (char*)PGROUNDDOWN((uint)p+sz-1);           
-  for(; p <= end; pa += PGSIZE, p += PGSIZE) {
+  for(; p != end; pa += PGSIZE, p += PGSIZE) {
     pte_t *pte = walkpgdir(pgdir, p, 1);                  // find the corresponding pagetable or create a new one
     if(pte == 0) return -1;
-    if((*pte) | PTE_P) panic("mappages");
+    if((*pte) & PTE_P) panic("mappages");
     *pte = pa | PTE_P | perm;
   }
   return 0;

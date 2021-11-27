@@ -63,12 +63,7 @@ void kinit() {
   char *p = end;
   char *end_of_4MB = P2V(4*1024*1024);
 
-  for(; p + PGSIZE <= end_of_4MB; p += PGSIZE) {
-    struct run *tmp = (struct run*)p;
-    tmp->next = kmem.head;
-    kmem.head = tmp;
-    kmem.pgnum++;
-  }
+  freerange(p, end_of_4MB);
 }
 
 // similar to kinit(), but map all the memory
@@ -79,11 +74,6 @@ void kinit_all() {
   char *p = P2V(4*1024*1024);
   char *end = P2V(PHYSTOP);
 
-  for(; p + PGSIZE <= end; p += PGSIZE) {
-    struct run *tmp = (struct run*)p;
-    tmp->next = kmem.head;
-    kmem.head = tmp;
-    kmem.pgnum++;
-  }
+  freerange(p, end);
 }
 

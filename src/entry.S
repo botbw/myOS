@@ -1,7 +1,6 @@
 #include "../include/mmu.h"
 #include "../include/param.h"
 #include "../include/memlayout.h"
-#include "../include/asm.h"
 # using macros to declare constants, $(CC) -S to to through pre-processing
 #define MULTIBOOT_HEADER_FLAGS 0x00000003
 
@@ -41,20 +40,20 @@ entry:
   pushl   %ebx
   /* Push the magic value. */
   pushl   %eax
-  push $2
-
+  /*
   # Jump to main(), and switch to executing at
   # high addresses. The indirect call is needed because
   # the assembler produces a PC-relative instruction
   # for a direct jump.
-  mov $cmain, %eax
-  jmp *%eax
-
+  */
+  movl $cmain, %eax
+  call %eax
+  
 spin:
   nop
   jmp spin
 
-# tell the assmbler to "allocate" a stack, this stack will be our kernel stack
+# set up a stack
 # notice that x86 stack grows from high address to low address.
 .p2align 4
 # kernel stack: 4KB

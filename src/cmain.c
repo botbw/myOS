@@ -39,6 +39,7 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
     mem_lower = mbi->mem_lower;
     mem_upper = mbi->mem_upper;
     phystop = ((mem_upper+1024)<<4); // mem_upper(in KB) + 1MB(1024 KB)
+    // however we are not going to use these values since this kernel simply follows the design of xv6
   } else return ;
 
   // init kernel memory (the first 4MB), for early use and more page tables

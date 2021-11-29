@@ -4,6 +4,7 @@
 #include "mmu.h"
 #include "kalloc.h"
 #include "vm.h"
+#include "gdt.h"
 
 
 /* Check if the bit BIT in FLAGS is set. */
@@ -30,6 +31,9 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   
   /* Am I booted by a Multiboot-compliant boot loader? */
   if(magic_number != MULTIBOOT_BOOTLOADER_MAGIC) return ;
+
+  // init global descriptor table
+  init_gdt();
 
   // initialize screen output
   if(init_serial() != 0) return ;

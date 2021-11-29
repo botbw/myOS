@@ -6,6 +6,7 @@ OBJS =\
 	vm.o\
 	string.o\
 	panic.o\
+	gdt.o\
 
 
 # Try to infer the correct QEMU

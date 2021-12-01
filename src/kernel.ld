@@ -12,6 +12,7 @@ SECTIONS
 	. = 0x80100000;
 
 	.text : AT(0x100000) {
+    *(.multiboot_header)
 		*(.text)
 	}
 

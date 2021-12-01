@@ -1,4 +1,6 @@
 #ifndef X86_H
+#define X86_H
+
 #include "types.h"
 // Routines to let C code use special x86 instructions.
 

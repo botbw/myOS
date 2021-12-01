@@ -7,6 +7,9 @@
     "types.h": "c",
     "kalloc.h": "c",
     "defs.h": "c",
-    "giantlock.h": "c"
+    "giantlock.h": "c",
+    "uart.h": "c",
+    "proc.h": "c",
+    "x86.h": "c"
   }
 }

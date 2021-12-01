@@ -6,9 +6,7 @@
 
 # multiboot header
 .p2align 2
-.text
-.global multiboot_header
-multiboot_header:
+.section .multiboot_header
   # magic number
   .long   MULTIBOOT_HEADER_MAGIC
   # flags
@@ -17,6 +15,7 @@ multiboot_header:
   .long   -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 
 # the kernel begins here. Do not return in this file!
+.text
 .global entry
 entry:
   cli
@@ -47,7 +46,7 @@ entry:
   # for a direct jump.
   */
   movl $cmain, %eax
-  call %eax
+  call *%eax
   
 spin:
   nop

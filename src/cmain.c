@@ -5,7 +5,9 @@
 #include "kalloc.h"
 #include "vm.h"
 #include "gdt.h"
-
+#include "string.h"
+#include "trap.h"
+#include "panic.h"
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -21,7 +23,7 @@
 uint mem_lower, mem_upper, phystop; // mem_lower is not used
 
 
-static char welcome_str[29] = "virtual memory boot succeeds";
+static char welcome_str[] = "virtual memory boot succeeds\n";
 
 void write_string(char* c, int len);
 int init_serial();
@@ -42,7 +44,7 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   if(CHECK_FLAG(mbi->flags, 0)) {
     mem_lower = mbi->mem_lower;
     mem_upper = mbi->mem_upper;
-    phystop = ((mem_upper+1024)<<4); // mem_upper(in KB) + 1MB(1024 KB)
+    phystop = ((mem_upper+1024)*1024); // mem_upper(in KB) + 1MB(1024 KB)
     // however we are not going to use these values since this kernel simply follows the design of xv6
   } else return ;
 
@@ -55,9 +57,20 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   // init the remnant of kernel memory
   kinit_all();
 
-  write_string(welcome_str, 29);
+  // print welcome string
+  write_string(welcome_str, strlen(welcome_str));
 
-  while(1);
+  // these multiprocessor drive code are copid from xv6 for further development, but this kernel is still a single-core processor one
+  // mpinit();
+  // lapicinit();
+  // we use PIC instead of APIC
+  
+  // initialize interrupt service routine (soft interrupt)
+  ISRs_init();
+
+  asm volatile("int %0"::"i"(T_IRQ0 +IRQ_TEST));
+
+  panic("kernel hasn't been finished");
 }
 
 // The boot page table used in entry.S and entryother.S.

@@ -7,8 +7,9 @@ OBJS =\
 	string.o\
 	panic.o\
 	gdt.o\
-
-
+	trap.o\
+	trap_asm.o\
+	ISRs.o\
 # Try to infer the correct QEMU
 ifndef QEMU
 QEMU = $(shell if which qemu > /dev/null; \
@@ -49,16 +50,20 @@ LDFLAGS = -m elf_i386
 
 
 
-kernel: $(OBJS) kernel.ld entry.o
+kernel: $(OBJS) kernel.ld entry.o ISRs.S
 	$(LD) $(LDFLAGS) -T kernel.ld -o kernel $(OBJS) entry.o 
 	$(OBJDUMP) -S kernel > kernel.asm
 	$(OBJDUMP) -t kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > kernel.sym
 	readelf -a kernel > elf.txt
+
 myOS.img: kernel grub.cfg
 	mkdir -p tmp/boot/grub
 	cp grub.cfg tmp/boot/grub
 	cp kernel tmp/boot
 	grub-mkrescue /usr/lib/grub/i386-pc -o myOS.img tmp
+
+ISRs.S: isr_generator.py
+	python3 isr_generator.py > ISRs.S
 
 
 CPUS = 1
@@ -79,5 +84,5 @@ qemu-gdb: myOS.img .gdbinit
 	qemu-system-i386 -nographic $(QEMUOPTS) -S $(QEMUGDB)
 
 clean:
-	rm *.o *.asm *.sym gdb.txt elf.txt -rf tmp kernel myOS.img
+	rm *.o *.asm *.sym gdb.txt elf.txt -rf tmp kernel myOS.img makeinfo
 			

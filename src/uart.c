@@ -1,6 +1,6 @@
 #include "x86.h"
+#include "uart.h"
 
-#define PORT 0x3f8          // COM1
 
 int init_serial() {
    outb(PORT + 1, 0x00);    // Disable all interrupts
@@ -44,7 +44,7 @@ void write_serial(char a) {
    outb(PORT,a);
 }
 
-void write_string(char* c, int len) {
+void write_string(const char* c, int len) {
   for(int i = 0; i < len; i++)
     write_serial(c[i]);
 }

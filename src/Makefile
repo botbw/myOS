@@ -51,7 +51,7 @@ LDFLAGS = -m elf_i386
 
 
 kernel: $(OBJS) kernel.ld entry.o ISRs.S
-	$(LD) $(LDFLAGS) -T kernel.ld -o kernel $(OBJS) entry.o 
+	$(LD) $(LDFLAGS) -T kernel.ld -o kernel entry.o $(OBJS) 
 	$(OBJDUMP) -S kernel > kernel.asm
 	$(OBJDUMP) -t kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > kernel.sym
 	readelf -a kernel > elf.txt

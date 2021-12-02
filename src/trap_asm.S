@@ -11,8 +11,6 @@ trap_begin:
   movw $(SEG_KDATA << 3), %ax
   movw %ax, %ds
   movw %ax, %es
-  movw %ax, %fs
-  movw %ax, %gs
 
   pushl %esp
   call trap_all

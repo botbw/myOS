@@ -6,16 +6,20 @@
 #include "proc.h"
 #include "defs.h"
 
-static const char str[] = "trap: test\n";
+static const char str[12] = "trap: test\n";
+static const char timer_str[14] = "timer awoken\n";
 
 struct gatedesc idt[256];
 extern uint ISRs[];
 
 void trap_all(struct trapframe *f) {
   if(f->trapno == T_IRQ0 + IRQ_TEST) {
-    write_string(str, strlen(str));
+    write_string(str, 12);
   }
-  panic("trap_all: no trapno catched\n");
+  if(f->trapno == T_IRQ0 + IRQ_TIMER) {
+    write_string(timer_str, 14);
+  }
+  // panic("trap_all: no trapno catched\n");
 }
 
 void

@@ -8,10 +8,13 @@
 #include "string.h"
 #include "trap.h"
 #include "panic.h"
+#include "picinit.h"
+#include "timer.h"
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
+static void unicore_interrupt_setup();
 
 // If bit 0 in the ‘flags’ word is set, then the ‘mem_*’ fields are valid.
 // ‘mem_lower’ and ‘mem_upper’ indicate the amount of lower and upper memory,
@@ -64,13 +67,10 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   // mpinit();
   // lapicinit();
   // we use PIC instead of APIC
-  
-  // initialize interrupt service routine (soft interrupt)
-  ISRs_init();
 
-  asm volatile("int %0"::"i"(T_IRQ0 +IRQ_TEST));
+  unicore_interrupt_setup();
 
-  panic("kernel hasn't been finished");
+  panic("kernel hasn't been finished\n");
 }
 
 // The boot page table used in entry.S and entryother.S.
@@ -85,3 +85,22 @@ pde_t entrypgdir[NPDENTRIES] = {
   // Map VA's [KERNBASE, KERNBASE+4MB) to PA's [0, 4MB)
   [KERNBASE>>PDXSHIFT] = (0) | PTE_P | PTE_W | PTE_PS,
 };
+
+static void unicore_interrupt_setup() {
+  // setup the interrupt scheme
+  // initialize interrupt service routine (soft interrupt)
+  ISRs_init();
+
+  // send a test IRQ
+  asm volatile("int %0"::"i"(T_IRQ0 +IRQ_TEST)); 
+
+  // panic("kernel hasn't been finished");
+
+  // initalize the Programmable Interrupt Controller
+  picinit();
+
+  // interrupt 100 times/sec
+  timerinit(100);
+  
+  asm volatile("sti");
+}

@@ -10,6 +10,9 @@ OBJS =\
 	trap.o\
 	trap_asm.o\
 	ISRs.o\
+	picinit.o\
+	timer.o\
+	gdt_flush.o\
 # Try to infer the correct QEMU
 ifndef QEMU
 QEMU = $(shell if which qemu > /dev/null; \

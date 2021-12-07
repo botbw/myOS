@@ -11,6 +11,7 @@
     "uart.h": "c",
     "proc.h": "c",
     "x86.h": "c",
-    "trap.h": "c"
+    "trap.h": "c",
+    "lock.h": "c"
   }
 }

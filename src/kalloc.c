@@ -1,7 +1,7 @@
 #include "mmu.h"
 #include "memlayout.h"
 #include "types.h"
-#include "giantlock.h"
+#include "lock.h"
 #include "defs.h"
 #include "kalloc.h"
 
@@ -14,6 +14,7 @@ struct run {
 
 // the kernel memory list, need to be locked when using it
 struct {
+  struct lock lk;
   struct run* head;
   uint pgnum;
   int use_lock;
@@ -26,20 +27,20 @@ void kfree(void *ptr) {
     panic("kfree");
 
   memset(ptr, 1, PGSIZE);
-  if(kmem.use_lock) acquire();
+  if(kmem.use_lock) acquire(&kmem.lk);
   struct run *tmp = (struct run*)ptr;
   tmp->next = kmem.head;
   kmem.head = tmp;
   kmem.pgnum++;
-  if(kmem.use_lock) release();
+  if(kmem.use_lock) release(&kmem.lk);
 }
 
 // alloc one memory page filled with junk;
 void *kalloc() {
-  if(kmem.use_lock) acquire();
+  if(kmem.use_lock) acquire(&kmem.lk);
   struct run *tmp = kmem.head;
   kmem.head = kmem.head->next;
-  if(kmem.use_lock) release();
+  if(kmem.use_lock) release(&kmem.lk);
   return (void*)tmp;
 }
 
@@ -57,7 +58,8 @@ void kinit() {
   kmem.head = 0;
   kmem.pgnum = 0;
   kmem.use_lock = 0;
-
+  initlock(&kmem.lk, "kmem");
+  
   char *p = end;
   char *end_of_4MB = P2V(4*1024*1024);
 

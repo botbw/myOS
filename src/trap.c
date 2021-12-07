@@ -14,10 +14,10 @@ extern uint ISRs[];
 
 void trap_all(struct trapframe *f) {
   if(f->trapno == T_IRQ0 + IRQ_TEST) {
-    write_string(str, 12);
+    uartwrite_string(str, 12);
   }
   if(f->trapno == T_IRQ0 + IRQ_TIMER) {
-    write_string(timer_str, 14);
+    uartwrite_string(timer_str, 14);
   }
   // panic("trap_all: no trapno catched\n");
 }

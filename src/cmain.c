@@ -10,6 +10,8 @@
 #include "panic.h"
 #include "picinit.h"
 #include "timer.h"
+#include "console.h"
+#include "uart.h"
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -28,21 +30,14 @@ uint mem_lower, mem_upper, phystop; // mem_lower is not used
 
 static char welcome_str[] = "virtual memory boot succeeds\n";
 
-void write_string(char* c, int len);
-int init_serial();
-
 
 void cmain(uint magic_number, multiboot_info_t *mbi) {
-  
   /* Am I booted by a Multiboot-compliant boot loader? */
   if(magic_number != MULTIBOOT_BOOTLOADER_MAGIC) return ;
-
   // init global descriptor table
   init_gdt();
-
   // initialize screen output
-  if(init_serial() != 0) return ;
-  
+  if(uartinit() != 0) return ; 
   // get memory infomation
   if(CHECK_FLAG(mbi->flags, 0)) {
     mem_lower = mbi->mem_lower;
@@ -50,26 +45,21 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
     phystop = ((mem_upper+1024)*1024); // mem_upper(in KB) + 1MB(1024 KB)
     // however we are not going to use these values since this kernel simply follows the design of xv6
   } else return ;
-
   // init kernel memory (the first 4MB), for early use and more page tables
   kinit();
-
   // init virtual memory
   kvmalloc();
-
   // init the remnant of kernel memory
   kinit_all();
-
   // print welcome string
-  write_string(welcome_str, strlen(welcome_str));
-
+  uartwrite_string(welcome_str, strlen(welcome_str));
   // these multiprocessor drive code are copid from xv6 for further development, but this kernel is still a single-core processor one
   // mpinit();
   // lapicinit();
   // we use PIC instead of APIC
-
   unicore_interrupt_setup();
-
+  // initialize console
+  consoleinit(); 
   panic("kernel hasn't been finished\n");
 }
 
@@ -90,17 +80,15 @@ static void unicore_interrupt_setup() {
   // setup the interrupt scheme
   // initialize interrupt service routine (soft interrupt)
   ISRs_init();
-
   // send a test IRQ
   asm volatile("int %0"::"i"(T_IRQ0 +IRQ_TEST)); 
-
-  // panic("kernel hasn't been finished");
-
   // initalize the Programmable Interrupt Controller
   picinit();
-
+  // set up UART interrupt
+  picenable(IRQ_COM1);
   // interrupt 100 times/sec
   timerinit(100);
+  // testing timer
+   asm volatile("sti");
   
-  asm volatile("sti");
 }

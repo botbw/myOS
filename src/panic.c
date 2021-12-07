@@ -3,6 +3,6 @@
 #include "uart.h"
 
 void panic(const char * a) {
-  write_string(a, strlen(a));
+  uartwrite_string(a, strlen(a));
   while(1);
 }

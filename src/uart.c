@@ -2,7 +2,7 @@
 #include "uart.h"
 
 
-int init_serial() {
+int uartinit() {
    outb(PORT + 1, 0x00);    // Disable all interrupts
    outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
    outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
@@ -24,12 +24,12 @@ int init_serial() {
    return 0;
 }
 
-int serial_received() {
+int uart_received() {
    return inb(PORT + 5) & 1;
 }
  
-char read_serial() {
-   while (serial_received() == 0);
+char uartreadc() {
+   while (uart_received() == 0);
  
    return inb(PORT);
 }
@@ -38,13 +38,13 @@ int is_transmit_empty() {
    return inb(PORT + 5) & 0x20;
 }
  
-void write_serial(char a) {
+void uartputc(char a) {
    while (is_transmit_empty() == 0);
  
    outb(PORT,a);
 }
 
-void write_string(const char* c, int len) {
+void uartwrite_string(const char* c, int len) {
   for(int i = 0; i < len; i++)
-    write_serial(c[i]);
+    uartputc(c[i]);
 }

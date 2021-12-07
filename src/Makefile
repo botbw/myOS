@@ -1,7 +1,7 @@
 OBJS =\
 	cmain.o\
 	uart.o\
-	giantlock.o\
+	lock.o\
 	kalloc.o\
 	vm.o\
 	string.o\
@@ -13,6 +13,8 @@ OBJS =\
 	picinit.o\
 	timer.o\
 	gdt_flush.o\
+	console.o\
+	
 # Try to infer the correct QEMU
 ifndef QEMU
 QEMU = $(shell if which qemu > /dev/null; \

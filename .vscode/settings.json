@@ -10,6 +10,7 @@
     "giantlock.h": "c",
     "uart.h": "c",
     "proc.h": "c",
-    "x86.h": "c"
+    "x86.h": "c",
+    "trap.h": "c"
   }
 }

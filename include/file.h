@@ -1,7 +1,8 @@
 #ifndef FILE_H
 #define FILE_H
+
 #include "types.h"
-#include "lock.h"
+#include "spinlock.h"
 #include "fs.h"
 
 struct file {
@@ -20,7 +21,7 @@ struct inode {
   uint dev;           // Device number
   uint inum;          // Inode number
   int ref;            // Reference count
-  struct lock lk; // protects everything below here
+  struct spinlock lk; // protects everything below here
   int valid;          // inode has been read from disk?
 
   short type;         // copy of disk inode

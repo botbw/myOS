@@ -1,7 +1,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "lock.h"
+#include "spinlock.h"
 #include "types.h"
 #include "proc.h"
 #include "trap.h"

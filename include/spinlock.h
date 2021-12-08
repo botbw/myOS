@@ -1,11 +1,14 @@
-#ifndef LOCK_H
-#define LOCK_H
+#ifndef SPINLOCK_H
+#define SPINLOCH_H
 
 #include "types.h"
+#include "proc.h"
+#include "panic.h"
+#include "x86.h"
+#include "memlayout.h"
 
-struct lock {
+struct spinlock {
   int locked;
-
   // For debugging:
   const char *name;        // Name of lock.
   struct cpu *cpu;   // The cpu holding the lock.
@@ -13,8 +16,8 @@ struct lock {
                      // that locked the lock.
 };
 
-void acquire(struct lock *);
-void release(struct lock *);
-void initlock(struct lock *, const char*);
+void acquire(struct spinlock *);
+void release(struct spinlock *);
+void initlock(struct spinlock *, const char*);
 
 #endif

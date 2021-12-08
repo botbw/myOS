@@ -64,5 +64,8 @@ struct proc {
 //   fixed-size stack
 //   expandable heap
 
+struct proc* myproc();
+struct cpu* mycpu();
+void sched();
 
 #endif

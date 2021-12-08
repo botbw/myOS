@@ -1,7 +1,7 @@
 #include "mmu.h"
 #include "memlayout.h"
 #include "types.h"
-#include "lock.h"
+#include "spinlock.h"
 #include "defs.h"
 #include "kalloc.h"
 
@@ -14,7 +14,7 @@ struct run {
 
 // the kernel memory list, need to be locked when using it
 struct {
-  struct lock lk;
+  struct spinlock lk;
   struct run* head;
   uint pgnum;
   int use_lock;

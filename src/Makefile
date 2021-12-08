@@ -1,7 +1,7 @@
 OBJS =\
 	cmain.o\
 	uart.o\
-	lock.o\
+	spinlock.o\
 	kalloc.o\
 	vm.o\
 	string.o\

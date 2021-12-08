@@ -12,6 +12,8 @@
     "proc.h": "c",
     "x86.h": "c",
     "trap.h": "c",
-    "lock.h": "c"
+    "lock.h": "c",
+    "spinlock.h": "c",
+    "console.h": "c"
   }
 }

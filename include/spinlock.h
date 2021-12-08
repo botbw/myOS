@@ -6,6 +6,8 @@
 #include "panic.h"
 #include "x86.h"
 #include "memlayout.h"
+#include "mmu.h"
+#include "proc.h"
 
 struct spinlock {
   int locked;

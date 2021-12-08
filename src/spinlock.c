@@ -56,14 +56,14 @@ void acquire(struct spinlock *lk) {
   pushcli();
   while(xchg(lk->locked, 1) != 0);
   __sync_synchronize();
-  lk->cpu = 0; // single-core processor
+  lk->cpu = mycpu(); // single-core processor should be 0
   getcallerpcs(&lk, lk->pcs);
 }
 
 // turn on interrupt
 void release(struct spinlock *lk) {
   lk->pcs[0] = 0;
-  lk->cpu = 0; // single-core processor
+  lk->cpu = -1; // single-core processor
   __sync_synchronize();
   
   lk->locked = 0; // should be atomic
@@ -74,5 +74,5 @@ void release(struct spinlock *lk) {
 void initlock(struct spinlock *lk, const char* str) {
   lk->name = str;
   lk->locked = 0;
-  lk->cpu = 0;
+  lk->cpu = -1;
 }

@@ -12,6 +12,8 @@
 #include "timer.h"
 #include "console.h"
 #include "uart.h"
+#include "disk.h"
+#include "buf.h"
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -58,8 +60,15 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   // lapicinit();
   // we use PIC instead of APIC
   unicore_interrupt_setup();
+  // initialize hard disk thru IDE, the first layer of fs
+  disk_init();  
+  // initialize the second layer of fs: cache, which are composed of buffers
+  buffers_init();
+  
   // initialize console
-  consoleinit(); 
+  // consoleinit(); 
+  
+  while(1);
   panic("kernel hasn't been finished\n");
 }
 

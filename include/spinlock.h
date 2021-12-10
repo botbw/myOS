@@ -1,5 +1,5 @@
 #ifndef SPINLOCK_H
-#define SPINLOCH_H
+#define SPINLOCK_H
 
 #include "types.h"
 #include "proc.h"
@@ -10,7 +10,7 @@
 #include "proc.h"
 
 struct spinlock {
-  int locked;
+  uint locked;
   // For debugging:
   const char *name;        // Name of lock.
   struct cpu *cpu;   // The cpu holding the lock.

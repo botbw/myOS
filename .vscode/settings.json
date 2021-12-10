@@ -14,6 +14,10 @@
     "trap.h": "c",
     "lock.h": "c",
     "spinlock.h": "c",
-    "console.h": "c"
+    "console.h": "c",
+    "panic.h": "c",
+    "buf.h": "c",
+    "sleeplock.h": "c",
+    "disk.h": "c"
   }
 }

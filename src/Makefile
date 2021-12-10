@@ -2,6 +2,7 @@ OBJS =\
 	cmain.o\
 	uart.o\
 	spinlock.o\
+	sleeplock.o\
 	kalloc.o\
 	vm.o\
 	string.o\
@@ -13,7 +14,8 @@ OBJS =\
 	picinit.o\
 	timer.o\
 	gdt_flush.o\
-	console.o\
+	disk.o\
+	buf.o
 	
 # Try to infer the correct QEMU
 ifndef QEMU

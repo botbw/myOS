@@ -4,7 +4,7 @@
 #include "spinlock.h"
 
 struct sleeplock {
-  int locked;
+  uint locked;
   struct spinlock lk; // protect the spinlock
 
   // debug
@@ -18,7 +18,9 @@ extern struct {
 
 void sleep(void*, struct spinlock*);
 void wakeup(void*);
-void acqure_sleeplock(struct sleeplock*);
+void acquire_sleeplock(struct sleeplock*);
 void release_sleeplock(struct sleeplock*);
+void init_sleeplock(struct sleeplock*, const char*);
+int holdingsleep(struct sleeplock *lk);
 
 #endif

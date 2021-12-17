@@ -58,6 +58,6 @@ struct dirent {
   char name[DIRSIZ];
 };
 
-
+void superblock_read(int, struct superblock*);
 
 #endif

@@ -1,0 +1,10 @@
+.DS_Store
+.vscode/
+*.o
+kernel.sym
+kernel.asm
+tmp
+kernel
+myOS.img
+makeinfo
+elf.txt

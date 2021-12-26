@@ -15,7 +15,10 @@ OBJS =\
 	timer.o\
 	gdt_flush.o\
 	disk.o\
-	buf.o
+	buf.o\
+	log.o\
+	file.o\
+	fs.o
 	
 # Try to infer the correct QEMU
 ifndef QEMU

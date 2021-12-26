@@ -4,6 +4,8 @@
 #include "types.h"
 #include "spinlock.h"
 #include "fs.h"
+#include "param.h"
+#include "log.h"
 
 struct file {
   enum { FD_NONE, FD_PIPE, FD_INODE } type;
@@ -42,5 +44,13 @@ struct devsw {
 extern struct devsw devsw[];
 
 #define CONSOLE 1
+
+void file_table_init();
+struct file* file_alloc();
+struct file* file_duplicate(struct file *pf);
+void file_close(struct file *pf);
+int file_stat(struct file *f, struct stat *st);
+int file_read(struct file *f, char *addr, int n);
+int file_write(struct file *f, char *addr, int n);
 
 #endif

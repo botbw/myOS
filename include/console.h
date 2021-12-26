@@ -12,5 +12,6 @@
 #include "x86.h"
 
 void consoleinit(void);
+void cprintf(char*, ...);
 
 #endif

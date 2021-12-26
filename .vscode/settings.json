@@ -18,6 +18,11 @@
     "panic.h": "c",
     "buf.h": "c",
     "sleeplock.h": "c",
-    "disk.h": "c"
+    "disk.h": "c",
+    "log.h": "c",
+    "param.h": "c",
+    "fs.h": "c",
+    "file.h": "c",
+    "string.h": "c"
   }
 }

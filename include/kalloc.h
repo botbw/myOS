@@ -4,4 +4,5 @@
 void kinit();
 void kinit_all();
 void *kalloc();
+void kfree(void *);
 #endif

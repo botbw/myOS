@@ -2,7 +2,6 @@
 // Input is from the keyboard or serial port.
 // Output is written to the screen and serial port.
 #include "console.h"
-static void consputc(int);
 
 // static int panicked = 0;
 

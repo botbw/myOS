@@ -24,4 +24,8 @@ struct log {
   struct logheader lh;
 };
 
+void log_init(int);
+void log_begin();
+void log_record(struct buf*);
+void log_end();
 #endif

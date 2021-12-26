@@ -148,6 +148,8 @@ log_end(void)
 }
 
 void log_init(int dev) {
+  if (sizeof(struct logheader) >= BSIZE)
+    panic("initlog: too big logheader");
   struct superblock sb;
   initlock(&log.lock, "log");
   

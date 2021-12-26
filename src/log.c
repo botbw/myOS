@@ -42,7 +42,7 @@ static void log_header_write() {
 }
 
 // install data to where they should be on the disk
-static log_install() {
+static void log_install() {
   for (int i = 0; i < log.lh.n; i++) {
     struct buf *from = buffer_read(log.dev, log.start + 1 + i);
     struct buf *to = buffer_read(log.dev, log.lh.block[i]);

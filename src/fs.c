@@ -1,7 +1,6 @@
-#include "fs.h"
-#include "buf.h"
-#include "log.h"
-#include "console.h"
+#include "fsdef.h"
+
+
 
 // blocks manipulation
 
@@ -24,7 +23,7 @@ static void zero_block(int dev, int blk_no) {
 static uint block_alloc(uint dev) {
   for(int b = 0; b < sb.size; b += BPB) {
     struct buf *bf = buffer_read(dev, BBLOCK(b, sb));
-    for(int bi = 0; bi < BPB & b + bi < sb.size; bi++) {
+    for(int bi = 0; bi < BPB && b + bi < sb.size; bi++) {
       int bits = 1 << (bi%8);
       if((bf->data[bi/8] & bits) == 0) {
         bf->data[bi/8] |= bits;
@@ -37,6 +36,7 @@ static uint block_alloc(uint dev) {
     buffer_release(bf);
   }
   panic("block_alloc");
+  return 0;
 }
 
 static void block_release(uint dev, uint blk_no) {
@@ -62,10 +62,10 @@ void inode_init(int dev) {
   
   initlock(&icache.lk, "icache");
   for(i = 0; i < NINODE; i++) {
-    initsleeplock(&icache.inodes[i].lk, "inode");
+    init_sleeplock(&icache.inodes[i].lk, "inode");
   }
 
-  readsb(dev, &sb);
+  superblock_read(dev, &sb);
   cprintf("sb: size %d nblocks %d ninodes %d nlog %d logstart %d\
  inodestart %d bmap start %d\n", sb.size, sb.nblocks,
           sb.ninodes, sb.nlog, sb.logstart, sb.inodestart,
@@ -100,6 +100,9 @@ static struct inode* inode_cache_get(uint dev, uint i_no) {
 
   return found;
 }
+
+static void
+inode_truncate(struct inode *ip);
 
 void inode_cache_release(struct inode* ip) {
   acquire_sleeplock(&ip->lk);
@@ -139,6 +142,7 @@ struct inode* inode_alloc(uint dev, short type) {
     buffer_release(bp);
   }
   panic("inode_alloc");
+  return 0;
 }
 
 struct inode* inode_duplicate(struct inode *i) {
@@ -177,7 +181,7 @@ void inode_unlock(struct inode *ip) {
   if(ip == 0 || !holdingsleep(&ip->lk) || ip->ref < 1)
     panic("inode_unlock");
 
-  releasesleep(&ip->lk);
+  release_sleeplock(&ip->lk);
 }
 
 void inode_cache_release_unlock(struct inode *ip) {
@@ -259,6 +263,8 @@ static uint block_map(struct inode *ip, uint bn)
   }
 
   panic("block_map: out of range");
+
+  return 0;
 }
 
 void inode_stat(struct inode *ip, struct stat *st) {
@@ -299,7 +305,7 @@ int inode_read(struct inode *ip, char *dst, uint off, uint n) {
   return n;
 }
 
-int inode_write(struct inode *ip, const char *src, uint off, uint n) {
+int inode_write(struct inode *ip, char *src, uint off, uint n) {
   uint tot, m;
   struct buf *bp;
 
@@ -324,7 +330,7 @@ int inode_write(struct inode *ip, const char *src, uint off, uint n) {
 
   if(n > 0 && off > ip->size){
     ip->size = off;
-    iupdate(ip);
+    inode_update(ip);
   }
   return n;
 }

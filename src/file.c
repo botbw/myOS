@@ -86,6 +86,7 @@ int file_read(struct file *f, char *addr, int n)
     return r;
   }
   panic("file_read");
+  return -1;
 }
 
 int file_write(struct file *f, char *addr, int n)
@@ -112,7 +113,7 @@ int file_write(struct file *f, char *addr, int n)
 
       log_begin();
       inode_lock(f->ip);
-      if ((r = writei(f->ip, addr + i, f->off, n1)) > 0)
+      if ((r = inode_write(f->ip, addr + i, f->off, n1)) > 0)
         f->off += r;
       inode_unlock(f->ip);
       log_end();
@@ -126,4 +127,5 @@ int file_write(struct file *f, char *addr, int n)
     return i == n ? n : -1;
   }
   panic("file_write");
+  return -1;
 }

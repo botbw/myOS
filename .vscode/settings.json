@@ -23,6 +23,7 @@
     "param.h": "c",
     "fs.h": "c",
     "file.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "stat.h": "c"
   }
 }

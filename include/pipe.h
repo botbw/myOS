@@ -17,4 +17,10 @@ struct pipe {
   int writeopen;  // write fd is still open
 };
 
+int pipe_alloc(struct file **ppf0, struct file **ppf1);
+void pipe_close(struct pipe *p, int writable);
+int pipe_write(struct pipe *p, char *addr, int n);
+int pipe_read(struct pipe *p, char *addr, int n);
+
+
 #endif

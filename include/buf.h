@@ -3,7 +3,6 @@
 
 #include "types.h"
 #include "sleeplock.h"
-#include "param.h"
 #include "fs.h"
 
 struct buf {
@@ -21,9 +20,5 @@ struct buf {
 #define B_VALID 0x2  // buffer has been read from disk
 #define B_DIRTY 0x4  // buffer needs to be written to disk
 
-void buffers_init();
-void buffer_release(struct buf*);
-struct buf* buffer_read(uint, uint);
-void buffer_write(struct buf*);
 
 #endif

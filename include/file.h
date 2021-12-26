@@ -2,10 +2,9 @@
 #define FILE_H
 
 #include "types.h"
-#include "spinlock.h"
-#include "fs.h"
+#include "sleeplock.h"
 #include "param.h"
-#include "log.h"
+#include "fs.h"
 
 struct file {
   enum { FD_NONE, FD_PIPE, FD_INODE } type;
@@ -23,7 +22,7 @@ struct inode {
   uint dev;           // Device number
   uint inum;          // Inode number
   int ref;            // Reference count
-  struct spinlock lk; // protects everything below here
+  struct sleeplock lk; // protects everything below here
   int valid;          // inode has been read from disk?
 
   short type;         // copy of disk inode
@@ -44,13 +43,5 @@ struct devsw {
 extern struct devsw devsw[];
 
 #define CONSOLE 1
-
-void file_table_init();
-struct file* file_alloc();
-struct file* file_duplicate(struct file *pf);
-void file_close(struct file *pf);
-int file_stat(struct file *f, struct stat *st);
-int file_read(struct file *f, char *addr, int n);
-int file_write(struct file *f, char *addr, int n);
 
 #endif

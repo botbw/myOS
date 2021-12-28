@@ -21,5 +21,7 @@ struct spinlock {
 void acquire(struct spinlock *);
 void release(struct spinlock *);
 void initlock(struct spinlock *, const char*);
+void pushcli();
+void popcli();
 
 #endif

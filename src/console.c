@@ -2,6 +2,7 @@
 // Input is from the keyboard or serial port.
 // Output is written to the screen and serial port.
 #include "console.h"
+#include "fsdef.h"
 
 // static int panicked = 0;
 
@@ -173,7 +174,8 @@ consoleintr(int (*getc)(void))
         consputc(BACKSPACE);
       }
       break;
-    case C('H'): case '\x7f':  // Backspace
+    case C('H'):
+    case '\x7f':  // Backspace
       if(input.e != input.w){
         input.e--;
         consputc(BACKSPACE);
@@ -204,14 +206,14 @@ consoleread(struct inode *ip, char *dst, int n)
   uint target;
   int c;
 
-  iunlock(ip);
+  inode_unlock(ip);
   target = n;
   acquire(&cons.lock);
   while(n > 0){
     while(input.r == input.w){
       if(myproc()->killed){
         release(&cons.lock);
-        ilock(ip);
+        inode_lock(ip);
         return -1;
       }
       sleep(&input.r, &cons.lock);
@@ -231,7 +233,7 @@ consoleread(struct inode *ip, char *dst, int n)
       break;
   }
   release(&cons.lock);
-  ilock(ip);
+  inode_lock(ip);
 
   return target - n;
 }
@@ -241,12 +243,12 @@ consolewrite(struct inode *ip, char *buf, int n)
 {
   int i;
 
-  iunlock(ip);
+  inode_unlock(ip);
   acquire(&cons.lock);
   for(i = 0; i < n; i++)
     consputc(buf[i] & 0xff);
   release(&cons.lock);
-  ilock(ip);
+  inode_lock(ip);
 
   return n;
 }

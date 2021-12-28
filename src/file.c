@@ -121,7 +121,7 @@ int file_write(struct file *f, char *addr, int n)
       if(r < 0)
         break;
       if(r != n1)
-        panic("short filewrite");
+        panic("short file_write");
       i += r;
     }
     return i == n ? n : -1;

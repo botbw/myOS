@@ -25,7 +25,8 @@ void inode_stat(struct inode *ip, struct stat *st);
 int inode_read(struct inode *ip, char *dst, uint off, uint n);
 int inode_write(struct inode *ip, char *src, uint off, uint n);
 int directory_link(struct inode *dp, char *name, uint inum);
-
+struct inode* namei(char *path);
+struct inode* nameiparent(char *path, char *name);
 
 // buf.c
 void buffers_init();

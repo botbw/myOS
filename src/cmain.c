@@ -14,6 +14,8 @@
 #include "uart.h"
 #include "disk.h"
 #include "buf.h"
+#include "fsdef.h"
+#include "proc.h"
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -30,7 +32,7 @@ static void unicore_interrupt_setup();
 uint mem_lower, mem_upper, phystop; // mem_lower is not used
 
 
-static char welcome_str[] = "virtual memory boot succeeds\n";
+static char welcome_str[] = "boot succeeds\n";
 
 
 void cmain(uint magic_number, multiboot_info_t *mbi) {
@@ -50,11 +52,11 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   // init kernel memory (the first 4MB), for early use and more page tables
   kinit();
   // init virtual memory
-  kvmalloc();
+  kvminit();
   // init the remnant of kernel memory
   kinit_all();
   // print welcome string
-  uartwrite_string(welcome_str, strlen(welcome_str));
+  uartwrite_string(welcome_str, sizeof(welcome_str));
   // these multiprocessor drive code are copid from xv6 for further development, but this kernel is still a single-core processor one
   // mpinit();
   // lapicinit();
@@ -64,9 +66,15 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   disk_init();  
   // initialize the second layer of fs: cache, which are composed of buffers
   buffers_init();
-  
+  // file table
+  file_table_init();
+  // initialize console, which allows recieving keyboard signal
+  consoleinit();
+  // process table
+  process_table_init();
   // initialize console
-  // consoleinit(); 
+  consoleinit(); 
+  
   
   while(1);
   panic("kernel hasn't been finished\n");
@@ -98,6 +106,6 @@ static void unicore_interrupt_setup() {
   // interrupt 100 times/sec
   timerinit(100);
   // testing timer
-   asm volatile("sti");
+  // asm volatile("sti");
   
 }

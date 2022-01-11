@@ -64,7 +64,7 @@ int mappages(pde_t* pgdir, void* va, uint sz, uint pa, int perm) {
 
 
 
-void kvmalloc() {
+void kvminit() {
   kpgdir = (pde_t*)kalloc();
   if(!kpgdir) return;
   // make sure all those PDE_P/PTE_P bits are clear
@@ -77,5 +77,32 @@ void kvmalloc() {
     }
   }
   switchkvm();
+}
+
+pde_t* setupkvm() {
+  pde_t *pgdir = kalloc();
+
+  if(!pgdir) return 0;
+
+  memset(kpgdir, 0, PGSIZE);
+  for(struct kmap_t* k = kmap; k < &kmap[NELEM(kmap)]; k++) {
+    if(mappages(kpgdir, k->virt, k->phys_end - k->phys_start,
+                (uint)k->phys_start, k->perm) < 0) {
+      panic("kvmalloc");
+    }
+  }
+  return pgdir;
+}
+
+void inituvm(pde_t *pgdir, char *init, uint sz)
+{
+  char *mem;
+
+  if(sz >= PGSIZE)
+    panic("inituvm: more than a page");
+  mem = kalloc();
+  memset(mem, 0, PGSIZE);
+  mappages(pgdir, 0, PGSIZE, V2P(mem), PTE_W|PTE_U);
+  memcpy(mem, init, sz);
 }
 

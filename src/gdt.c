@@ -4,7 +4,7 @@
 
 __attribute__((aligned(8))) struct segdesc gdt[NSEGS];
 
-void gdt_flush();
+extern void gdt_flush();
 
 void init_gdt() {
   gdt[0] = SEG(0, 0, 0, 0);

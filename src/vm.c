@@ -3,7 +3,8 @@
 #include "memlayout.h"
 #include "x86.h"
 #include "mmu.h"
-
+#include "proc.h"
+#include "vm.h"
 
 extern char data[];
 
@@ -25,9 +26,7 @@ pde_t *kpgdir;
 
 // Switch h/w page table register to the kernel-only page table,
 // for when no process is running.
-static void
-switchkvm(void)
-{
+void switchkvm(void) {
   lcr3(V2P(kpgdir));   // switch to the kernel page table
 }
 
@@ -64,7 +63,7 @@ int mappages(pde_t* pgdir, void* va, uint sz, uint pa, int perm) {
 
 
 
-void kvmalloc() {
+void kvminit() {
   kpgdir = (pde_t*)kalloc();
   if(!kpgdir) return;
   // make sure all those PDE_P/PTE_P bits are clear
@@ -79,3 +78,50 @@ void kvmalloc() {
   switchkvm();
 }
 
+pde_t* setupkvm() {
+  pde_t *pgdir = kalloc();
+
+  if(!pgdir) return 0;
+
+  memset(kpgdir, 0, PGSIZE);
+  for(struct kmap_t* k = kmap; k < &kmap[NELEM(kmap)]; k++) {
+    if(mappages(kpgdir, k->virt, k->phys_end - k->phys_start,
+                (uint)k->phys_start, k->perm) < 0) {
+      panic("kvmalloc");
+    }
+  }
+  return pgdir;
+}
+
+void inituvm(pde_t *pgdir, char *init, uint sz) {
+  char *mem;
+
+  if(sz >= PGSIZE)
+    panic("inituvm: more than a page");
+  mem = kalloc();
+  memset(mem, 0, PGSIZE);
+  mappages(pgdir, 0, PGSIZE, V2P(mem), PTE_W|PTE_U);
+  memcpy(mem, init, sz);
+}
+
+void switchuvm(struct proc *p) {
+  if(p == 0)
+    panic("switchuvm: no process");
+  if(p->kstack == 0)
+    panic("switchuvm: no kstack");
+  if(p->pgdir == 0)
+    panic("switchuvm: no pgdir");
+
+  pushcli();
+  mycpu()->gdt[SEG_TSS] = SEG16(STS_T32A, &mycpu()->ts,
+                                sizeof(mycpu()->ts)-1, 0);
+  mycpu()->gdt[SEG_TSS].s = 0;
+  mycpu()->ts.ss0 = SEG_KDATA << 3;
+  mycpu()->ts.esp0 = (uint)p->kstack + KSTACKSIZE;
+  // setting IOPL=0 in eflags *and* iomb beyond the tss segment limit
+  // forbids I/O instructions (e.g., inb and outb) from user space
+  mycpu()->ts.iomb = (ushort) 0xFFFF;
+  ltr(SEG_TSS << 3);
+  lcr3(V2P(p->pgdir));  // switch to process's address space
+  popcli();
+}

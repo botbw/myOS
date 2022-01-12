@@ -1,7 +1,9 @@
 #include "pipe.h"
+#include "fsdef.h"
+#include "kalloc.h"
 
 int pipe_alloc(struct file **ppf0, struct file **ppf1) {
-  struct pipe *pipe;
+  struct pipe *pipe = 0;
 
   if((*ppf0 = file_alloc()) == 0 || (*ppf1 = file_alloc()) == 0) {
     goto fail;

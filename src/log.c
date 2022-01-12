@@ -1,4 +1,5 @@
 #include "log.h"
+#include "fsdef.h"
 
 struct log log;
 

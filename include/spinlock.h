@@ -23,5 +23,6 @@ void release(struct spinlock *);
 void initlock(struct spinlock *, const char*);
 void pushcli();
 void popcli();
+int holding(struct spinlock *lock);
 
 #endif

@@ -1,4 +1,5 @@
 #include "file.h"
+#include "fsdef.h"
 
 struct devsw devsw[NDEV];
 

@@ -1,4 +1,5 @@
 #include "spinlock.h"
+#include "proc.h"
 
 // we will be running on a single processor system.
 // turning on/off interrupt will be enough to solve competitive condition
@@ -75,4 +76,13 @@ void initlock(struct spinlock *lk, const char* str) {
   lk->name = str;
   lk->locked = 0;
   lk->cpu = 0;
+}
+
+// Check whether this cpu is holding the lock.
+int holding(struct spinlock *lock) {
+  int r;
+  pushcli();
+  r = lock->locked && lock->cpu == mycpu();
+  popcli();
+  return r;
 }

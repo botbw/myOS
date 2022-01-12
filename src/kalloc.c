@@ -40,6 +40,7 @@ void *kalloc() {
   if(kmem.use_lock) acquire(&kmem.lk);
   struct run *tmp = kmem.head;
   kmem.head = kmem.head->next;
+  kmem.pgnum--;
   if(kmem.use_lock) release(&kmem.lk);
   return (void*)tmp;
 }
@@ -75,5 +76,9 @@ void kinit_all() {
   char *end = P2V(PHYSTOP);
 
   freerange(p, end);
+}
+
+int freepages() {
+  return kmem.pgnum;
 }
 

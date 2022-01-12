@@ -7,19 +7,24 @@
 #include "defs.h"
 
 static const char str[12] = "trap: test\n";
-static const char timer_str[14] = "timer awoken\n";
+// static const char timer_str[14] = "timer awoken\n";
+extern void kbdintr();
 
 struct gatedesc idt[256];
 extern uint ISRs[];
 
 void trap_all(struct trapframe *f) {
-  if(f->trapno == T_IRQ0 + IRQ_TEST) {
-    uartwrite_string(str, 12);
+  switch(f->trapno) {
+    case T_IRQ0 + IRQ_TEST:
+      uartwrite_string(str, 12);
+      break;
+    case T_IRQ0 + IRQ_KBD:
+      kbdintr();
+      break;
+
+    default:
+      panic("trap_all: no trapno catched\n");
   }
-  if(f->trapno == T_IRQ0 + IRQ_TIMER) {
-    uartwrite_string(timer_str, 14);
-  }
-  // panic("trap_all: no trapno catched\n");
 }
 
 void

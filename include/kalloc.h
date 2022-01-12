@@ -5,4 +5,6 @@ void kinit();
 void kinit_all();
 void *kalloc();
 void kfree(void *);
+int freepages();
+
 #endif

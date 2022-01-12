@@ -43,5 +43,10 @@ int file_stat(struct file *f, struct stat *st);
 int file_read(struct file *f, char *addr, int n);
 int file_write(struct file *f, char *addr, int n);
 
+// pipe.c
+int pipe_alloc(struct file **ppf0, struct file **ppf1);
+void pipe_close(struct pipe *p, int writable);
+int pipe_write(struct pipe *p, char *addr, int n);
+int pipe_read(struct pipe *p, char *addr, int n);
 
 #endif

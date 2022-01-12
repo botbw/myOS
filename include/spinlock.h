@@ -2,7 +2,6 @@
 #define SPINLOCK_H
 
 #include "types.h"
-#include "proc.h"
 #include "panic.h"
 #include "x86.h"
 #include "memlayout.h"

@@ -6,7 +6,6 @@
 #include "spinlock.h"
 #include "kalloc.h"
 #include "mmu.h"
-#include "vm.h"
 
 // Per-CPU state
 struct cpu {
@@ -20,8 +19,6 @@ struct cpu {
   struct proc *proc;           // The process running on this cpu or null
 };
 
-extern struct cpu *cpu;
-extern int ncpu;
 extern void swtch(struct context **old, struct context *new);
 
 
@@ -74,7 +71,7 @@ struct cpu* mycpu();
 void sched();
 void process_table_init();
 
-void trapret();
+void trap_return();
 void forkret();
 
 #endif

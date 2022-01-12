@@ -7,7 +7,8 @@
 #include "defs.h"
 
 static const char str[12] = "trap: test\n";
-static const char timer_str[14] = "timer awoken\n";
+// static const char timer_str[14] = "timer awoken\n";
+extern void kbdintr();
 
 struct gatedesc idt[256];
 extern uint ISRs[];

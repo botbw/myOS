@@ -1,6 +1,7 @@
 #include "keyboard.h"
 
 // keyboard driver, never want to read it
+extern void consoleintr(int (*)());
 
 int
 kbdgetc(void)

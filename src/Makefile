@@ -18,7 +18,12 @@ OBJS =\
 	buf.o\
 	log.o\
 	file.o\
-	fs.o
+	fs.o\
+	pipe.o\
+	console.o\
+	keyboard.o\
+	swtch.o\
+	proc.o
 	
 # Try to infer the correct QEMU
 ifndef QEMU
@@ -60,8 +65,8 @@ LDFLAGS = -m elf_i386
 
 
 
-kernel: $(OBJS) kernel.ld entry.o ISRs.S
-	$(LD) $(LDFLAGS) -T kernel.ld -o kernel entry.o $(OBJS) 
+kernel: $(OBJS) kernel.ld entry.o ISRs.S initcode
+	$(LD) $(LDFLAGS) -T kernel.ld -o kernel entry.o $(OBJS) -b binary initcode 
 	$(OBJDUMP) -S kernel > kernel.asm
 	$(OBJDUMP) -t kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > kernel.sym
 	readelf -a kernel > elf.txt
@@ -74,6 +79,11 @@ myOS.img: kernel grub.cfg
 
 ISRs.S: isr_generator.py
 	python3 isr_generator.py > ISRs.S
+
+initcode: initcode.S
+	$(CC) $(CFLAGS) -nostdinc -I. -c initcode.S
+	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o initcode.out initcode.o
+	$(OBJCOPY) -S -O binary initcode.out initcode
 
 
 CPUS = 1

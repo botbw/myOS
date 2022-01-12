@@ -1,4 +1,5 @@
 #include "spinlock.h"
+#include "proc.h"
 
 // we will be running on a single processor system.
 // turning on/off interrupt will be enough to solve competitive condition

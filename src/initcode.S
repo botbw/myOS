@@ -1,4 +1,6 @@
 # this code will be compile into an independent part and load into c code separately
+#define T_SYSCALL       64      // system call
+#include "syscall.h"
 
 start:
   pushl $argv

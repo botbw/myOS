@@ -12,47 +12,6 @@ void init_sleeplock(struct sleeplock *lk, const char* name) {
   lk->pid = 0;
 }
 
-void sleep(void *chan, struct spinlock *lk) {
-  struct proc *p = myproc();
-  if(p == 0 || lk == 0) panic("sleep");
-
-  if(lk != &ptable.lock) {
-    acquire(&ptable.lock);
-    release(lk);
-  }
-
-  p->chan = chan;
-  p->state = SLEEPING;
-
-  sched();
-
-  p->chan = 0;
-
-  if(lk != &ptable.lock) {
-    acquire(&ptable.lock);
-    release(lk);
-  }
-}
-
-static void
-wakeup1(void *chan)
-{
-  struct proc *p;
-
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
-      p->state = RUNNABLE;
-}
-
-// Wake up all processes sleeping on chan.
-void
-wakeup(void *chan)
-{
-  acquire(&ptable.lock);
-  wakeup1(chan);
-  release(&ptable.lock);
-}
-
 void acquire_sleeplock(struct sleeplock *lk) {
   acquire(&lk->lk);
   while(lk->locked == 1) {

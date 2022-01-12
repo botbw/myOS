@@ -32,8 +32,6 @@ static void unicore_interrupt_setup();
 uint mem_lower, mem_upper, phystop; // mem_lower is not used
 
 
-static char welcome_str[] = "boot succeeds\n";
-
 
 void cmain(uint magic_number, multiboot_info_t *mbi) {
   /* Am I booted by a Multiboot-compliant boot loader? */
@@ -41,7 +39,8 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   // init global descriptor table
   init_gdt();
   // initialize screen output
-  if(uartinit() != 0) return ; 
+  if(uartinit() != 0) return ;
+  cprintf("boot succeed\n"); 
   // get memory infomation
   if(CHECK_FLAG(mbi->flags, 0)) {
     mem_lower = mbi->mem_lower;
@@ -49,14 +48,16 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
     phystop = ((mem_upper+1024)*1024); // mem_upper(in KB) + 1MB(1024 KB)
     // however we are not going to use these values since this kernel simply follows the design of xv6
   } else return ;
+  cprintf("total available: %d mb (should be the same as hardware setting)\n", phystop/(1024*1024));
   // init kernel memory (the first 4MB), for early use and more page tables
   kinit();
   // init virtual memory
   kvminit();
-  // init the remnant of kernel memory
+  // init the remnant of kernel memory (actually we can finish it once)
   kinit_all();
-  // print welcome string
-  uartwrite_string(welcome_str, sizeof(welcome_str));
+  int tmp = freepages();
+  cprintf("total pages: %d, which is %d mb (shoule be around 0x80000000 kb)\n", tmp, tmp*PGSIZE/(1024*1024));
+
   // these multiprocessor drive code are copid from xv6 for further development, but this kernel is still a single-core processor one
   // mpinit();
   // lapicinit();
@@ -76,7 +77,6 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   consoleinit(); 
   
   
-  while(1);
   panic("kernel hasn't been finished\n");
 }
 

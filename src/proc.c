@@ -1,10 +1,14 @@
 #include "proc.h"
 #include "fsdef.h"
+#include "vm.h"
 
 struct {
   struct spinlock lk;
   struct proc procs[NPROC];
 } process_table;
+
+struct cpu cpu;
+int ncpu;
 
 int max_pid = 0;
 
@@ -13,7 +17,11 @@ void process_table_init() {
 }
 
 struct cpu* mycpu() {
-  return cpu;
+  return &cpu;
+}
+
+int cpuid() {
+  return 0;
 }
 
 struct proc* myproc() {
@@ -27,8 +35,8 @@ struct proc* myproc() {
 void forkret(void)
 {
   static int first = 1;
-  // Still holding ptable.lock from scheduler.
-  release(&ptable.lock);
+  // Still holding process_table.lk from scheduler.
+  release(&process_table.lk);
 
   if (first) {
     // Some initialization functions must be run in the context
@@ -39,7 +47,7 @@ void forkret(void)
     log_init(ROOTDEV);
   }
 
-  // Return to "caller", actually trapret (see allocproc).
+  // Return to "caller", actually trap_return (see allocproc).
 }
 static struct proc* process_alloc() {
   acquire(&process_table.lk);
@@ -59,9 +67,9 @@ static struct proc* process_alloc() {
       char *sp = pp->kstack + KSTACKSIZE;
       sp -= sizeof(struct trapframe);
       sp -= sizeof(uint*);
-      *(uint*)sp = (uint)trapret; // *(void (*)())sp = trapret;
+      *(uint*)sp = (uint)trap_return; // *(void (*)())sp = trap_return;
       sp -= sizeof(struct context);
-      pp->context = sp;
+      pp->context = (struct context*) sp;
       memset(pp->context, 0, sizeof(struct context));
       pp->context->eip = (uint)forkret;
 
@@ -75,7 +83,7 @@ static struct proc* process_alloc() {
 void user_init() {
   struct proc *p = process_alloc();
 
-  if(p->pgdir = setupkvm() == 0) {
+  if((p->pgdir = setupkvm()) == 0) {
     panic("user_init");
   }
 
@@ -97,11 +105,11 @@ void user_init() {
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
-  acquire(&ptable.lock);
+  acquire(&process_table.lk);
 
   p->state = RUNNABLE;
 
-  release(&ptable.lock);
+  release(&process_table.lk);
 }
 
 void scheduler() {
@@ -114,13 +122,13 @@ void scheduler() {
     sti();
 
     // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    acquire(&process_table.lk);
+    for(p = process_table.procs; p < &process_table.procs[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
 
       // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
+      // to release process_table.lk and then reacquire it
       // before jumping back to us.
       c->proc = p;
       switchuvm(p);
@@ -133,7 +141,7 @@ void scheduler() {
       // It should have changed its p->state before coming back.
       c->proc = 0;
     }
-    release(&ptable.lock);
+    release(&process_table.lk);
   }
 }
 
@@ -143,8 +151,8 @@ sched(void)
   int intena;
   struct proc *p = myproc();
 
-  if(!holding(&ptable.lock))
-    panic("sched ptable.lock");
+  if(!holding(&process_table.lk))
+    panic("sched process_table.lock");
   if(mycpu()->ncli != 1)
     panic("sched locks");
   if(p->state == RUNNING)
@@ -159,8 +167,49 @@ sched(void)
 void
 yield(void)
 {
-  acquire(&ptable.lock);  //DOC: yieldlock
+  acquire(&process_table.lk);  //DOC: yieldlock
   myproc()->state = RUNNABLE;
   sched();
-  release(&ptable.lock);
+  release(&process_table.lk);
+}
+
+void sleep(void *chan, struct spinlock *lk) {
+  struct proc *p = myproc();
+  if(p == 0 || lk == 0) panic("sleep");
+
+  if(lk != &process_table.lk) {
+    acquire(&process_table.lk);
+    release(lk);
+  }
+
+  p->chan = chan;
+  p->state = SLEEPING;
+
+  sched();
+
+  p->chan = 0;
+
+  if(lk != &process_table.lk) {
+    acquire(&process_table.lk);
+    release(lk);
+  }
+}
+
+static void
+wakeup1(void *chan)
+{
+  struct proc *p;
+
+  for(p = process_table.procs; p < &process_table.procs[NPROC]; p++)
+    if(p->state == SLEEPING && p->chan == chan)
+      p->state = RUNNABLE;
+}
+
+// Wake up all processes sleeping on chan.
+void
+wakeup(void *chan)
+{
+  acquire(&process_table.lk);
+  wakeup1(chan);
+  release(&process_table.lk);
 }

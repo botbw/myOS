@@ -4,12 +4,30 @@
 #include "console.h"
 #include "fsdef.h"
 
+#define BACKSPACE 0x100
+
 // static int panicked = 0;
 
 static struct {
   struct spinlock lock;
   int locking;
 } cons;
+
+void
+consputc(int c)
+{
+  // if(panicked){
+  //   cli();
+  //   for(;;)
+  //     ;
+  // }
+
+  if(c == BACKSPACE){
+    uartputc('\b'); uartputc(' '); uartputc('\b');
+  } else
+    uartputc(c);
+  // cgaputc(c);
+}
 
 static void
 printint(int xx, int base, int sign)
@@ -92,7 +110,6 @@ cprintf(char *fmt, ...)
 
 
 //PAGEBREAK: 50
-#define BACKSPACE 0x100
 // #define CRTPORT 0x3d4
 // static ushort *crt = (ushort*)P2V(0xb8000);  // CGA memory
 
@@ -128,22 +145,6 @@ cprintf(char *fmt, ...)
 //   outb(CRTPORT+1, pos);
 //   crt[pos] = ' ' | 0x0700;
 // }
-
-void
-consputc(int c)
-{
-  // if(panicked){
-  //   cli();
-  //   for(;;)
-  //     ;
-  // }
-
-  if(c == BACKSPACE){
-    uartputc('\b'); uartputc(' '); uartputc('\b');
-  } else
-    uartputc(c);
-  // cgaputc(c);
-}
 
 #define INPUT_BUF 128
 struct {
@@ -196,7 +197,7 @@ consoleintr(int (*getc)(void))
   }
   release(&cons.lock);
   if(doprocdump) {
-    procdump();  // now call procdump() wo. cons.lock held
+    // procdump();  // now call procdump() wo. cons.lock held
   }
 }
 

@@ -11,10 +11,6 @@ struct sleeplock {
   int pid;
 };
 
-extern struct {
-  struct spinlock lock;
-  struct proc proc[NPROC];
-} ptable;
 
 void sleep(void*, struct spinlock*);
 void wakeup(void*);

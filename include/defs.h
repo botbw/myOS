@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "kalloc.h"
+#include "proc.h"
 #include "vm.h"
 #include "string.h"
 #include "panic.h"

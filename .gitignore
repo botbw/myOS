@@ -11,3 +11,5 @@ makeinfo
 elf.txt
 mkfs
 fs.img
+initcode
+initcode.out

@@ -86,7 +86,7 @@ initcode: initcode.S
 	$(OBJCOPY) -S -O binary initcode.out initcode
 
 
-fs.img: ../mkfs ../Makefile userfile.txt
+fs.img: userfile.txt
 	cd .. && make fs.img
 
 CPUS = 1

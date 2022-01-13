@@ -9,6 +9,7 @@ struct {
 
 struct cpu cpu;
 int ncpu;
+static struct proc *initproc;
 
 int max_pid = 0;
 
@@ -57,6 +58,8 @@ static struct proc* process_alloc() {
     if(pp->state == UNUSED) {
       pp->state = EMBRYO;
       pp->pid = ++max_pid;
+      
+      release(&process_table.lk);
 
       if((pp->kstack = kalloc()) == 0) {
         pp->state = UNUSED;
@@ -66,6 +69,7 @@ static struct proc* process_alloc() {
 
       char *sp = pp->kstack + KSTACKSIZE;
       sp -= sizeof(struct trapframe);
+      pp->tf = (struct trapframe*) sp;
       sp -= sizeof(uint*);
       *(uint*)sp = (uint)trap_return; // *(void (*)())sp = trap_return;
       sp -= sizeof(struct context);
@@ -82,6 +86,8 @@ static struct proc* process_alloc() {
 
 void user_init() {
   struct proc *p = process_alloc();
+
+  initproc = p;
 
   if((p->pgdir = setupkvm()) == 0) {
     panic("user_init");
@@ -190,8 +196,8 @@ void sleep(void *chan, struct spinlock *lk) {
   p->chan = 0;
 
   if(lk != &process_table.lk) {
-    acquire(&process_table.lk);
-    release(lk);
+    release(&process_table.lk);
+    acquire(lk);
   }
 }
 

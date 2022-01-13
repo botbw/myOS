@@ -68,9 +68,10 @@ struct proc {
 
 struct proc* myproc();
 struct cpu* mycpu();
+void scheduler();
 void sched();
 void process_table_init();
-
+void user_init();
 void trap_return();
 void forkret();
 

@@ -93,8 +93,7 @@ idestart(struct buf *b)
 }
 
 // Interrupt handler.
-void
-ideintr(void)
+void ideintr(void)
 {
   struct buf *b;
 

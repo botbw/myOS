@@ -83,9 +83,9 @@ pde_t* setupkvm() {
 
   if(!pgdir) return 0;
 
-  memset(kpgdir, 0, PGSIZE);
+  memset(pgdir, 0, PGSIZE);
   for(struct kmap_t* k = kmap; k < &kmap[NELEM(kmap)]; k++) {
-    if(mappages(kpgdir, k->virt, k->phys_end - k->phys_start,
+    if(mappages(pgdir, k->virt, k->phys_end - k->phys_start,
                 (uint)k->phys_start, k->perm) < 0) {
       panic("kvmalloc");
     }

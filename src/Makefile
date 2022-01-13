@@ -86,9 +86,12 @@ initcode: initcode.S
 	$(OBJCOPY) -S -O binary initcode.out initcode
 
 
+fs.img: userfile.txt
+	cd .. && make fs.img
+
 CPUS = 1
 QEMU = qemu-system-i386
-QEMUOPTS = -drive file=myOS.img,index=0,media=disk,format=raw -smp $(CPUS) -m 512 $(QEMUEXTRA)
+QEMUOPTS = -drive file=myOS.img,index=0,media=disk,format=raw -drive file=fs.img,index=1,media=disk,format=raw -smp $(CPUS) -m 512 $(QEMUEXTRA)
 # try to generate a unique GDB port
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)
 # QEMU's gdb stub command line changed in 0.11
@@ -100,9 +103,9 @@ QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@
 
 
-qemu-gdb: myOS.img .gdbinit
+qemu-gdb: myOS.img fs.img .gdbinit
 	qemu-system-i386 -nographic $(QEMUOPTS) -S $(QEMUGDB)
 
 clean:
-	rm *.o *.asm *.sym gdb.txt elf.txt -rf tmp kernel myOS.img makeinfo
+	rm *.o *.asm *.sym gdb.txt elf.txt -rf tmp kernel myOS.img fs.img makeinfo initcode initcode.out
 			

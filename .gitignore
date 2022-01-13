@@ -1,6 +1,7 @@
 .DS_Store
 .vscode/
 *.o
+gdb.txt
 kernel.sym
 kernel.asm
 tmp
@@ -8,3 +9,7 @@ kernel
 myOS.img
 makeinfo
 elf.txt
+mkfs
+fs.img
+initcode
+initcode.out

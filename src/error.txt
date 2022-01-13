@@ -1,0 +1,1 @@
+qemu-system-i386 -nographic -drive file=myOS.img,index=0,media=disk,format=raw -drive file=fs.img,index=0,media=disk,format=raw -smp 1 -m 512  -S -gdb tcp::26000

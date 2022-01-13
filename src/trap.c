@@ -5,6 +5,9 @@
 #include "mmu.h"
 #include "proc.h"
 #include "defs.h"
+#include "console.h"
+#include "disk.h"
+
 
 static const char str[12] = "trap: test\n";
 // static const char timer_str[14] = "timer awoken\n";
@@ -15,13 +18,20 @@ extern uint ISRs[];
 
 void trap_all(struct trapframe *f) {
   switch(f->trapno) {
+    case T_SYSCALL:
+      cprintf("this should came from initcode\n");
+      while(1);
     case T_IRQ0 + IRQ_TEST:
       uartwrite_string(str, 12);
       break;
     case T_IRQ0 + IRQ_KBD:
       kbdintr();
       break;
-
+    case T_IRQ0 + IRQ_IDE:
+      ideintr();
+      break;
+    case T_IRQ0 + IRQ_TIMER:
+      break;
     default:
       panic("trap_all: no trapno catched\n");
   }

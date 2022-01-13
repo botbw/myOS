@@ -75,8 +75,10 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   process_table_init();
   // initialize console
   consoleinit(); 
-  
-  
+  // initialize user program
+  user_init();
+  // start user program
+  scheduler();
   panic("kernel hasn't been finished\n");
 }
 

@@ -8,6 +8,6 @@
 
 void disk_init();
 void iderw(struct buf* b);
-
+void ideintr(void);
 
 #endif

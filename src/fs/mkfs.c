@@ -8,10 +8,17 @@
 #include <assert.h>
 
 #define stat xv6_stat  // avoid clash with host struct stat
-#include "include/types.h"
-#include "include/fs.h"
-#include "include/stat.h"
-#include "include/param.h"
+
+// avoid clashing with my headers because I worte shits headers
+#define X86_H
+#define STRING_H
+#define PROC_H
+#define PANIC_H
+
+#include "../../include/types.h"
+#include "../../include/fs.h"
+#include "../../include/stat.h"
+#include "../../include/param.h"
 
 #ifndef static_assert
 #define static_assert(a, b) do { switch (0) case 0: case (a): ; } while (0)
@@ -107,6 +114,10 @@ main(int argc, char *argv[])
   printf("nmeta %d (boot, super, log blocks %u inode blocks %u, bitmap blocks %u) blocks %d total %d\n",
          nmeta, nlog, ninodeblocks, nbitmap, nblocks, FSSIZE);
 
+    printf("sb: size %d nblocks %d ninodes %d nlog %d logstart %d\
+ inodestart %d bmap start %d\n", sb.size, sb.nblocks,
+          sb.ninodes, sb.nlog, sb.logstart, sb.inodestart,
+          sb.bmapstart);
   freeblock = nmeta;     // the first free block that we can allocate
 
   for(i = 0; i < FSSIZE; i++)

@@ -2,13 +2,16 @@
 #define FS_H
 
 #include "types.h"
+#include "fsdef.h"
+#include "buf.h"
+#include "file.h"
+#include "stat.h"
 
 // On-disk file system format.
 // Both the kernel and user programs use this header file.
 
 
 #define ROOTINO 1  // root i-number
-#define BSIZE 512  // block size
 
 // Disk layout:
 // [ boot block | super block | log | inode blocks |
@@ -25,10 +28,6 @@ struct superblock {
   uint inodestart;   // Block number of first inode block
   uint bmapstart;    // Block number of first free map block
 };
-
-#define NDIRECT 12
-#define NINDIRECT (BSIZE / sizeof(uint))
-#define MAXFILE (NDIRECT + NINDIRECT)
 
 // On-disk inode structure
 struct dinode {

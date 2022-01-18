@@ -6,6 +6,8 @@
 #include "buf.h"
 #include "string.h"
 #include "fs.h"
+#include "fsdef.h"
+
 
 // Contents of the header block, used for both the on-disk header block
 // and to keep track in memory of logged block# before commit.
@@ -24,8 +26,4 @@ struct log {
   struct logheader lh;
 };
 
-void log_init(int);
-void log_begin();
-void log_record(struct buf*);
-void log_end();
 #endif

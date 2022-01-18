@@ -13,3 +13,4 @@ mkfs
 fs.img
 initcode
 initcode.out
+*.swp

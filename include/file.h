@@ -4,7 +4,11 @@
 #include "types.h"
 #include "sleeplock.h"
 #include "param.h"
-#include "fs.h"
+#include "fsdef.h"
+
+#define NDIRECT 12
+#define NINDIRECT (BSIZE / sizeof(uint))
+#define MAXFILE (NDIRECT + NINDIRECT)
 
 struct file {
   enum { FD_NONE, FD_PIPE, FD_INODE } type;

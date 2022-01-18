@@ -86,8 +86,8 @@ initcode: initcode.S
 	$(OBJCOPY) -S -O binary initcode.out initcode
 
 
-fs.img: userfile.txt
-	cd .. && make fs.img
+fs.img: userfile.txt fs/mkfs.c
+	cd fs && make fs.img
 
 CPUS = 1
 QEMU = qemu-system-i386

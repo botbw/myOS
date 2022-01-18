@@ -2,13 +2,12 @@
 #define FSDEF_H
 
 // file system function definition
-#include "types.h"
-#include "fs.h"
-#include "file.h"
-#include "stat.h"
-#include "buf.h"
-#include "log.h"
-#include "console.h"
+struct inode;
+struct stat;
+struct buf;
+struct pipe;
+struct file;
+struct superblock;
 
 
 // fs.c
@@ -48,5 +47,20 @@ int pipe_alloc(struct file **ppf0, struct file **ppf1);
 void pipe_close(struct pipe *p, int writable);
 int pipe_write(struct pipe *p, char *addr, int n);
 int pipe_read(struct pipe *p, char *addr, int n);
+
+// log.c
+void log_init(int);
+void log_begin();
+void log_record(struct buf*);
+void log_end();
+
+// disk.c
+void disk_init();
+void iderw(struct buf* b);
+void ideintr(void);
+
+// console.c
+void consoleinit(void);
+void cprintf(char*, ...);
 
 #endif

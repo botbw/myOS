@@ -32,6 +32,7 @@ void switchkvm(void) {
 
 // go through the page directories using virtual address, page allocation is optional
 pte_t *walkpgdir(pde_t *pgdir, const void* va, int alloc) {
+    // using kernel pagetable
   pde_t *pde = &pgdir[PDX(va)];
   pte_t *pgtbl;
   if(*pde & PTE_P) {
@@ -47,6 +48,7 @@ pte_t *walkpgdir(pde_t *pgdir, const void* va, int alloc) {
 }
 
 int mappages(pde_t* pgdir, void* va, uint sz, uint pa, int perm) {
+    // using kernel pagetable
   char *p = (char*)PGROUNDDOWN((uint)va);                 // mapping is by pages
   char *end = (char*)PGROUNDDOWN((uint)p+sz-1);           
   while(1) {
@@ -124,4 +126,103 @@ void switchuvm(struct proc *p) {
   ltr(SEG_TSS << 3);
   lcr3(V2P(p->pgdir));  // switch to process's address space
   popcli();
+}
+
+pde_t *copyuvm(pde_t *pgdir, uint sz) {
+    // using kernel pagetable
+    pde_t *newpgdir;
+
+    if((newpgdir = setupkvm()) == 0) {
+        return 0;
+    }
+
+    for(char *i = 0; i < (char*)sz; i += PGSIZE) {
+        pte_t *pte = walkpgdir(pgdir, i, 0);
+        if(!pte)
+            panic("copyuvm");
+        if(!(*pte & PTE_P))
+            panic("copyuvm");
+        uint pa = PTE_ADDR(*pte);
+        uint flags = PTE_FLAGS(*pte);
+        char *newpage = kalloc();
+        if(!newpage) {
+            kfree(newpgdir);
+            return 0;
+        }
+        memcpy(newpage, P2V(pa), PGSIZE);
+        if(mappages(newpgdir, i, PGSIZE, V2P(newpage), flags) == -1) {
+            kfree(newpage);
+            kfree(newpgdir);
+            return 0;
+        }
+    }
+
+    return newpgdir;
+}
+
+void freeuvm(pde_t *pgdir) {
+    if(!pgdir) panic("freevm");
+
+    deallocuvm(pgdir, KERNBASE, 0);
+
+    for(int i = 0; i < NPDENTRIES; i++){
+        if(pgdir[i] & PTE_P){
+            char * v = P2V(PTE_ADDR(pgdir[i]));
+            kfree(v);
+        }
+    }
+
+    kfree(pgdir);
+}
+
+int allocuvm(pde_t *pgdir, uint oldsz, uint newsz) {
+  char *mem;
+  uint a;
+
+  if(newsz >= KERNBASE)
+    return 0;
+  if(newsz < oldsz)
+    return oldsz;
+
+  a = PGROUNDUP(oldsz);
+  for(; a < newsz; a += PGSIZE){
+    mem = kalloc();
+    if(mem == 0){
+      panic("allocuvm: out of memory\n");
+      deallocuvm(pgdir, newsz, oldsz);
+      return 0;
+    }
+    memset(mem, 0, PGSIZE);
+    if(mappages(pgdir, (char*)a, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){
+      panic("allocuvm: out of memory (2)\n");
+      deallocuvm(pgdir, newsz, oldsz);
+      kfree(mem);
+      return 0;
+    }
+  }
+  return newsz;
+}
+
+int deallocuvm(pde_t *pgdir, uint oldsz, uint newsz) {
+  pte_t *pte;
+  uint a, pa;
+
+  if(newsz >= oldsz)
+    return oldsz;
+
+  a = PGROUNDUP(newsz);
+  for(; a  < oldsz; a += PGSIZE){
+    pte = walkpgdir(pgdir, (char*)a, 0);
+    if(!pte) // if the pagetable doesn't exist
+      a = PGADDR(PDX(a) + 1, 0, 0) - PGSIZE; // we can look to next pagetable (since this pagetable has been empty), -PGSIZE is to cancel the auto increment in for loop
+    else if((*pte & PTE_P) != 0){
+      pa = PTE_ADDR(*pte);
+      if(pa == 0)
+        panic("kfree");
+      char *v = P2V(pa);
+      kfree(v);
+      *pte = 0;
+    }
+  }
+  return newsz;
 }

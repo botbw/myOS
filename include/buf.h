@@ -3,7 +3,11 @@
 
 #include "types.h"
 #include "sleeplock.h"
+#include "fsdef.h"
 #include "fs.h"
+
+#define BSIZE 512  // block size
+
 
 struct buf {
   int flags;

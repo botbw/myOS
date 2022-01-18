@@ -73,6 +73,12 @@ void sched();
 void process_table_init();
 void user_init();
 void trap_return();
+void sleep(void*, struct spinlock*);
+void wakeup(void*);
 void forkret();
+int fork();
+void exit();
+int wait();
+int growproc();
 
 #endif

@@ -1,8 +1,6 @@
 #include "log.h"
-#include "fsdef.h"
 
 struct log log;
-
 
 // write the data from cache (in memory) to log (on disk)
 // the blocks should be cached since before modified them you have to call buffer_read() at least once.

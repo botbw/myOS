@@ -15,7 +15,7 @@ exit:
   jmp exit
 
 path:
-  .string "/init" # null-terminated
+  .string "/rootproc" # null-terminated
 
 argv:
   .long path

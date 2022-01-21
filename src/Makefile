@@ -107,5 +107,8 @@ qemu-gdb: myOS.img fs.img .gdbinit
 	qemu-system-i386 -nographic $(QEMUOPTS) -S $(QEMUGDB)
 
 clean:
-	rm *.o *.asm *.sym gdb.txt elf.txt -rf tmp kernel myOS.img fs.img makeinfo initcode initcode.out
+	rm *.o *.asm *.sym gdb.txt elf.txt \
+	-rf tmp kernel myOS.img fs.img makeinfo\
+	initcode initcode.out fs/fs.cfg fs/mkfs\
+	
 			

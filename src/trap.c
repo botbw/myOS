@@ -7,14 +7,16 @@
 #include "defs.h"
 #include "console.h"
 #include "disk.h"
+#include "timer.h"
 
 
 static const char str[12] = "trap: test\n";
 // static const char timer_str[14] = "timer awoken\n";
 extern void kbdintr();
+extern struct timer timer;
+extern uint ISRs[];
 
 struct gatedesc idt[256];
-extern uint ISRs[];
 
 void trap_all(struct trapframe *f) {
   switch(f->trapno) {

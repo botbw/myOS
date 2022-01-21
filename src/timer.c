@@ -23,6 +23,8 @@
 #define TIMER_RATEGEN   0x04    // mode 2, rate generator
 #define TIMER_16BIT     0x30    // r/w counter 16 bits, LSB first
 
+struct timer timer;
+
 void
 timerinit(int freq)
 {

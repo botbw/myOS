@@ -7,7 +7,7 @@
 #define SYS_wait    3
 #define SYS_pipe    4
 #define SYS_read    5
-#define SYS_kill    6
+// #define SYS_kill    6
 #define SYS_exec    7
 #define SYS_fstat   8
 #define SYS_chdir   9
@@ -23,5 +23,27 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+
+int sys_chdir(void);
+int sys_close(void);
+int sys_dup(void);
+int sys_exec(void);
+int sys_exit(void);
+int sys_fork(void);
+int sys_fstat(void);
+int sys_getpid(void);
+// int sys_kill(void);
+int sys_link(void);
+int sys_mkdir(void);
+int sys_mknod(void);
+int sys_open(void);
+int sys_pipe(void);
+int sys_read(void);
+int sys_sbrk(void);
+int sys_sleep(void);
+int sys_unlink(void);
+int sys_wait(void);
+int sys_write(void);
+int sys_uptime(void);
 
 #endif

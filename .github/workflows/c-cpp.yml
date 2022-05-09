@@ -16,6 +16,7 @@ jobs:
     - name: dependencies
       run: |
         sudo apt-get install xorriso
+        sudo apt-get install pacman
         sudo pacman -S mtools
     - name: make
       run: |

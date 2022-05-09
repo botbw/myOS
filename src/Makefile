@@ -104,6 +104,7 @@ QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
 
 
 qemu-gdb: myOS.img fs.img .gdbinit
+	sh gdbconfig.sh
 	qemu-system-i386 -nographic $(QEMUOPTS) -S $(QEMUGDB)
 
 clean:

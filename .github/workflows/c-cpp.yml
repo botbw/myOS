@@ -14,7 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: dependencies
-      run: sudo apt-get install xorriso
+      run: |
+        sudo apt-get install xorriso
+        sudo pacman -S mtools
     - name: make
       run: |
         cd src/ 

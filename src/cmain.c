@@ -3,7 +3,6 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "kalloc.h"
-#include "vm.h"
 #include "gdt.h"
 #include "string.h"
 #include "trap.h"
@@ -15,10 +14,14 @@
 #include "disk.h"
 #include "buf.h"
 #include "fsdef.h"
+#include "vm.h"
 #include "proc.h"
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
+
+#define PRINTLINE cprintf("***************************************\n");
+
 
 static void unicore_interrupt_setup();
 
@@ -40,6 +43,7 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   init_gdt();
   // initialize screen output
   if(uartinit() != 0) return ;
+  PRINTLINE
   cprintf("boot succeed\n"); 
   // get memory infomation
   if(CHECK_FLAG(mbi->flags, 0)) {
@@ -48,6 +52,7 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
     phystop = ((mem_upper+1024)*1024); // mem_upper(in KB) + 1MB(1024 KB)
     // however we are not going to use these values since this kernel simply follows the design of xv6
   } else return ;
+  PRINTLINE
   cprintf("total available: %d mb (should be the same as hardware setting)\n", phystop/(1024*1024));
   // init kernel memory (the first 4MB), for early use and more page tables
   kinit();
@@ -56,6 +61,7 @@ void cmain(uint magic_number, multiboot_info_t *mbi) {
   // init the remnant of kernel memory (actually we can finish it once)
   kinit_all();
   int tmp = freepages();
+  PRINTLINE
   cprintf("total pages: %d, which is %d mb (shoule be around 0x80000000 kb)\n", tmp, tmp*PGSIZE/(1024*1024));
 
   // these multiprocessor drive code are copid from xv6 for further development, but this kernel is still a single-core processor one

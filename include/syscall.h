@@ -7,7 +7,7 @@
 #define SYS_wait    3
 #define SYS_pipe    4
 #define SYS_read    5
-// #define SYS_kill    6
+#define SYS_kill    6
 #define SYS_exec    7
 #define SYS_fstat   8
 #define SYS_chdir   9
@@ -24,6 +24,7 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 
+void syscall();
 int sys_chdir(void);
 int sys_close(void);
 int sys_dup(void);

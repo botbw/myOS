@@ -23,8 +23,12 @@ OBJS =\
 	console.o\
 	keyboard.o\
 	swtch.o\
-	proc.o
-	
+	proc.o\
+	syscall.o\
+
+USRLIB = \
+	usrsyscall.o\	
+
 # Try to infer the correct QEMU
 ifndef QEMU
 QEMU = $(shell if which qemu > /dev/null; \

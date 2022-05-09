@@ -1,6 +1,8 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#include "spinlock.h"
+
 struct timer
 {
     struct spinlock tickslock;

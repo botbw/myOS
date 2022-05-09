@@ -95,7 +95,7 @@ void user_init() {
   p->tf->esp = PGSIZE;
   p->tf->eip = 0;  // beginning of initcode.S
 
-  safestrcpy(p->name, "initcode", sizeof(p->name));
+  safestrcpy(p->name, "rootproc", sizeof(p->name));
   p->cwd = namei("/");
 
   acquire(&process_table.lk);

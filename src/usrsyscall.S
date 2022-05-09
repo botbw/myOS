@@ -1,6 +1,3 @@
-# this code will be compile into an independent part and load into c code separately
-#define T_SYSCALL       64      // system call
-
 // System call numbers
 #define SYS_fork    1
 #define SYS_exit    2
@@ -24,21 +21,35 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 
-start:
-  pushl $argv
-  pushl $path
-  pushl $0 # when exec returns, the code runs from 0 of user space (just like movl exec, %eax; pushl $0; ljmp *%eax)
-  movl $SYS_exec, %eax
-  int $T_SYSCALL
 
-exit: 
-  movl $SYS_exit, %eax
-  int $T_SYSCALL
-  jmp exit
+#define T_SYSCALL       64      // system call
 
-path:
-  .string "/rootproc\0" # null-terminated
 
-argv:
-  .long path
-  .long 0
+#define SYSCALL(name) \
+  .globl name; \
+  name: \
+    movl $SYS_ ## name, %eax; \
+    int $T_SYSCALL; \
+    ret
+
+SYSCALL(fork)
+SYSCALL(exit)
+SYSCALL(wait)
+SYSCALL(pipe)
+SYSCALL(read)
+SYSCALL(write)
+SYSCALL(close)
+SYSCALL(kill)
+SYSCALL(exec)
+SYSCALL(open)
+SYSCALL(mknod)
+SYSCALL(unlink)
+SYSCALL(fstat)
+SYSCALL(link)
+SYSCALL(mkdir)
+SYSCALL(chdir)
+SYSCALL(dup)
+SYSCALL(getpid)
+SYSCALL(sbrk)
+SYSCALL(sleep)
+SYSCALL(uptime)

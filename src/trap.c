@@ -8,10 +8,11 @@
 #include "console.h"
 #include "disk.h"
 #include "timer.h"
+#include "syscall.h"
+
+#define PRINTLINE cprintf("***************************************\n");
 
 
-static const char str[12] = "trap: test\n";
-// static const char timer_str[14] = "timer awoken\n";
 extern void kbdintr();
 extern struct timer timer;
 extern uint ISRs[];
@@ -21,10 +22,17 @@ struct gatedesc idt[256];
 void trap_all(struct trapframe *f) {
   switch(f->trapno) {
     case T_SYSCALL:
-      cprintf("this should came from initcode\n");
-      while(1);
+      if(myproc()->killed)
+        exit();
+      myproc()->tf = f;
+      syscall();
+      if(myproc()->killed)
+        exit();
+      break;
     case T_IRQ0 + IRQ_TEST:
-      uartwrite_string(str, 12);
+      PRINTLINE
+      cprintf("Trap test passed\n");
+      PRINTLINE
       break;
     case T_IRQ0 + IRQ_KBD:
       kbdintr();

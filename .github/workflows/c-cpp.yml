@@ -16,7 +16,7 @@ jobs:
     - name: dependencies
       run: sudo apt-get install xorriso
     - name: make
-      run:
+      run: |
         cd src/ 
         make myOS.img
 
